@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <SDL2/SDL.h>
+#include <stdbool.h>
 
 typedef struct {
 	uint8_t bgRed;
@@ -11,7 +12,9 @@ typedef struct {
 
 extern Colors bgColors;
 
-extern void menuLoop(SDL_Window *window, SDL_Renderer *renderer);
-extern void mainLoop(SDL_Window *window, SDL_Renderer *renderer);
+extern int winWidth, winHeight;
+
+extern bool menuLoop(SDL_Window *window, SDL_Renderer *renderer);
+extern void gameLoop(SDL_Window *window, SDL_Renderer *renderer);
 
 #endif

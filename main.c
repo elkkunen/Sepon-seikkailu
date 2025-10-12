@@ -1,7 +1,8 @@
-// gcc main.c game_loop.c game_menu.c -o game $(sdl2-config --cflags --libs) -lSDL2_ttf
+// gcc main.c game_loop.c game_menu.c -o game $(sdl2-config --cflags --libs) -lSDL2_ttf -lSDL2_image
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <time.h>
+#include <stdbool.h>
 #include "game.h"
 
 Colors bgColors = {0};
@@ -18,12 +19,14 @@ int main(int argc, char *argv[]) {
 	}
 
 	SDL_Init(SDL_INIT_VIDEO);
-	TTF_Init();
 	
-	SDL_Window *window = SDL_CreateWindow("GAME", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN);
+	SDL_Window *window = SDL_CreateWindow("GAME", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-	menuLoop(window, renderer);
+	bool gameRunning;
+	do {
+		gameRunning = menuLoop(window, renderer);
+	} while (gameRunning);
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
