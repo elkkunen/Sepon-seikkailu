@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include "game.h"
 
+int winWidth, winHeight;
+
 Colors bgColors = {0};
 
 int main(int argc, char *argv[]) {
@@ -15,13 +17,16 @@ int main(int argc, char *argv[]) {
 			case 'r': bgColors = (Colors){166, 68, 51}; break;
 			case 'g': bgColors = (Colors){66, 166, 51}; break;
 			case 'b': bgColors = (Colors){51, 116, 166}; break;
+			case 'w': bgColors = (Colors){255, 255, 255}; break;
 		}
 	}
 
 	SDL_Init(SDL_INIT_VIDEO);
 	
-	SDL_Window *window = SDL_CreateWindow("GAME", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	SDL_Window *window = SDL_CreateWindow("Sepon Seikkailu", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	SDL_GetWindowSize(window, &winWidth, &winHeight);
 
 	bool gameRunning;
 	do {

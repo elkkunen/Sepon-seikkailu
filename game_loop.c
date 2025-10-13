@@ -7,7 +7,15 @@ typedef struct {
 	int width, height;
 	int health;
 	Colors colors;
+	SDL_Rect hitbox;
 } Player;
+
+typedef struct {
+	int x, y;
+	int width, height;
+	Colors colors;
+	SDL_Rect hitbox;
+} Box;
 
 typedef enum {
 	UP = 0,
@@ -28,8 +36,19 @@ void definePlayer(Player *player) {
 	player->colors.blue = 255;
 }
 
+void defineBox(Box *box) {
+	box->width = 32;
+	box->height = 32;
+	box->x = rand() % (winWidth - box->width);
+	box->y = rand() % (winHeight - box->height);
+	box->colors.red = rand() % 255;
+	box->colors.green = rand() % 255;
+	box->colors.blue = rand() % 255;
+}
+
 void drawPlayer(SDL_Renderer *rend, Player *player, SDL_Texture *image, int angle) {
 	SDL_Rect pRect = {player->x, player->y, player->width, player->height};
+	player->hitbox = pRect;
 	if (image) {
 		SDL_RenderCopyEx(rend, image, NULL, &pRect, angle, NULL, 0);
 	}
@@ -37,6 +56,13 @@ void drawPlayer(SDL_Renderer *rend, Player *player, SDL_Texture *image, int angl
 		SDL_SetRenderDrawColor(rend, player->colors.red, player->colors.green, player->colors.blue, 255);
 		SDL_RenderFillRect(rend, &pRect);
 	}
+}
+
+void drawBox(SDL_Renderer *rend, Box *box) {
+	SDL_Rect bRect = {box->x, box->y, box->width, box->height};
+	box->hitbox = bRect;
+	SDL_SetRenderDrawColor(rend, box->colors.red, box->colors.green, box->colors.blue, 255);
+	SDL_RenderFillRect(rend, &bRect);
 }
 
 void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
@@ -48,6 +74,9 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 
 	Player player;
 	definePlayer(&player);
+
+	Box box;
+	defineBox(&box);
 
 	SDL_Event event;
 	uint8_t running = 1;
@@ -89,6 +118,17 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 							break;
 						case SDLK_ESCAPE: running = 0; break;
 					}
+				case SDL_WINDOWEVENT_RESIZED:
+					SDL_GetWindowSize(window, &winWidth, &winHeight);
+			}
+		}
+
+		if (SDL_HasIntersection(&player.hitbox, &box.hitbox)) {
+			switch (direction) {
+				case UP: box.y -= step; break;
+				case DOWN: box.y += step; break;
+				case LEFT: box.x -= step; break;
+				case RIGHT: box.x += step; break;
 			}
 		}
 
@@ -96,6 +136,7 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 		SDL_RenderClear(renderer);
 
 		drawPlayer(renderer, &player, playerImage, direction);
+		drawBox(renderer, &box);
 
 		SDL_RenderPresent(renderer);
 

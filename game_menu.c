@@ -44,12 +44,9 @@ SDL_Rect createTextBox(SDL_Texture *texture, int x, int y) {
     return rect;
 }
 
-int winWidth, winHeight;
-
 bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     TTF_Init();
-    SDL_GetWindowSize(window, &winWidth, &winHeight);
-
+    
     Colors headerTextColor = {0, 0, 255};
     SDL_Texture *headerTexture = createText(renderer, "Sepon Seikkailu", "fonts/Header.ttf", 42, &headerTextColor);
     SDL_Rect headerTextBox = createTextBox(headerTexture, 0, 90);
