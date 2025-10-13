@@ -5,9 +5,9 @@
 #include <stdbool.h>
 
 typedef struct {
-	uint8_t bgRed;
-	uint8_t bgGreen;
-	uint8_t bgBlue;
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
 } Colors;
 
 extern Colors bgColors;

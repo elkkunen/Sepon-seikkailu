@@ -26,7 +26,7 @@ bool isMouseHovering(SDL_Rect *rect) {
 SDL_Texture *createText(SDL_Renderer *rend, char *text, char *fontName, uint8_t fontSize, Colors *colors) {
     TTF_Font *font = TTF_OpenFont(fontName, fontSize);
 
-    SDL_Color color = {colors->bgRed, colors->bgGreen, colors->bgBlue, 255};
+    SDL_Color color = {colors->red, colors->green, colors->blue, 255};
 
     SDL_Surface *surface = TTF_RenderText_Blended(font, text, color);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface);
@@ -39,9 +39,9 @@ SDL_Rect createTextBox(SDL_Texture *texture, int x, int y) {
     int w, h;
     SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 
-    SDL_Rect dst = {x, y, w, h};
+    SDL_Rect rect = {x, y, w, h};
 
-    return dst;
+    return rect;
 }
 
 int winWidth, winHeight;
@@ -50,15 +50,19 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     TTF_Init();
     SDL_GetWindowSize(window, &winWidth, &winHeight);
 
-    SDL_Texture *texture[BUTTON_AMOUNT];
+    Colors headerTextColor = {0, 0, 255};
+    SDL_Texture *headerTexture = createText(renderer, "Sepon Seikkailu", "fonts/Header.ttf", 42, &headerTextColor);
+    SDL_Rect headerTextBox = createTextBox(headerTexture, 0, 90);
+
+    SDL_Texture *btnTexture[BUTTON_AMOUNT];
     SDL_Rect button[BUTTON_AMOUNT];
 
-    Colors textColor = {0, 0, 0};
+    Colors btnTextColor = {0, 0, 0};
     char *buttonTexts[] = {"START", "SETTINGS", "EXIT"};
 
     for (int i = 0; i < BUTTON_AMOUNT; i ++) {
-        texture[i] = createText(renderer, buttonTexts[i], "fonts/main.ttf", 32, &textColor);
-        button[i] = createTextBox(texture[i], (winWidth - 125) / 2, 40 + 80 * i);
+        btnTexture[i] = createText(renderer, buttonTexts[i], "fonts/Buttons.ttf", 32, &btnTextColor);
+        button[i] = createTextBox(btnTexture[i], (winWidth - winWidth / 4) / 2, 180 + 60 * i);
     }
 
     SDL_Event event;
@@ -87,24 +91,31 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, bgColors.bgRed, bgColors.bgGreen, bgColors.bgBlue, 255);
+        SDL_SetRenderDrawColor(renderer, bgColors.red, bgColors.green, bgColors.blue, 255);
         SDL_RenderClear(renderer);
+
+        SDL_SetRenderDrawColor(renderer, bgColors.red, bgColors.green, bgColors.blue, 255);
+        SDL_RenderFillRect(renderer, &headerTextBox);
+        SDL_RenderCopy(renderer, headerTexture, NULL, &headerTextBox);
 
         for (int i = 0; i < BUTTON_AMOUNT; i ++) {
             if (isMouseHovering(&button[i])) SDL_SetRenderDrawColor(renderer, 161, 161, 161, 255);
             else SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             SDL_RenderFillRect(renderer, &button[i]);
-            SDL_RenderCopy(renderer, texture[i], NULL, &button[i]);
+            SDL_RenderCopy(renderer, btnTexture[i], NULL, &button[i]);
         }
         
         SDL_RenderPresent(renderer);
 
         SDL_Delay(16);
     }
+
+    SDL_DestroyTexture(headerTexture);
     for (int i = 0; i < BUTTON_AMOUNT; i ++) {
-        SDL_DestroyTexture(texture[i]);
+        SDL_DestroyTexture(btnTexture[i]);
     }
     TTF_Quit();
+
     switch (mode) {
         case GAME:
             gameLoop(window, renderer);
