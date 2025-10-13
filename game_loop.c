@@ -1,5 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include "game.h"
 
 typedef struct {
@@ -67,10 +70,15 @@ void drawBox(SDL_Renderer *rend, Box *box) {
 
 void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 	IMG_Init(IMG_INIT_PNG);
+	TTF_Init();
 
 	SDL_Surface *surface = IMG_Load("images/Seppo.png");
 	SDL_Texture *playerImage = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
+
+	Colors scoreColor = {255, 255, 255};
+	SDL_Texture *scoreTexture = createText(renderer, "Score: 0", DEFAULT_FONT, 24, &scoreColor);
+	SDL_Rect scoreTextBox = createTextBox(scoreTexture, 5, 5);
 
 	Player player;
 	definePlayer(&player);
@@ -79,10 +87,12 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 	defineBox(&box);
 
 	SDL_Event event;
-	uint8_t running = 1;
+	bool running = 1;
 	
 	int step = 10;
 	int direction = UP;
+	int score = 0;
+	char scoreString[16];
 
 	while (running) {
 		while (SDL_PollEvent(&event)) {
@@ -118,8 +128,6 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 							break;
 						case SDLK_ESCAPE: running = 0; break;
 					}
-				case SDL_WINDOWEVENT_RESIZED:
-					SDL_GetWindowSize(window, &winWidth, &winHeight);
 			}
 		}
 
@@ -132,15 +140,27 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 			}
 		}
 
+		if (box.y < 0 - box.height + 10 || box.y > winWidth - 10 || box.x < 0 - box.width + 10 || box.x > winHeight - 10) {
+			score ++;
+			sprintf(scoreString, "Score: %d", score);
+			scoreTexture = createText(renderer, scoreString, DEFAULT_FONT, 24, &scoreColor);
+			defineBox(&box);
+		}
+
 		SDL_SetRenderDrawColor(renderer, bgColors.red, bgColors.green, bgColors.blue, 255);
 		SDL_RenderClear(renderer);
 
 		drawPlayer(renderer, &player, playerImage, direction);
 		drawBox(renderer, &box);
 
+		SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreTextBox);
+
 		SDL_RenderPresent(renderer);
 
 		SDL_Delay(16);
 	}
+	SDL_DestroyTexture(scoreTexture);
 	SDL_DestroyTexture(playerImage);
+	TTF_Quit();
+	IMG_Quit();
 }

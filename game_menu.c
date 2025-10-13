@@ -48,7 +48,7 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     TTF_Init();
     
     Colors headerTextColor = {0, 0, 255};
-    SDL_Texture *headerTexture = createText(renderer, "Sepon Seikkailu", "fonts/Header.ttf", 42, &headerTextColor);
+    SDL_Texture *headerTexture = createText(renderer, "Sepon Seikkailu", HEADER_FONT, 42, &headerTextColor);
     SDL_Rect headerTextBox = createTextBox(headerTexture, 0, 90);
 
     SDL_Texture *btnTexture[BUTTON_AMOUNT];
@@ -58,7 +58,7 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     char *buttonTexts[] = {"START", "SETTINGS", "EXIT"};
 
     for (int i = 0; i < BUTTON_AMOUNT; i ++) {
-        btnTexture[i] = createText(renderer, buttonTexts[i], "fonts/Buttons.ttf", 32, &btnTextColor);
+        btnTexture[i] = createText(renderer, buttonTexts[i], DEFAULT_FONT, 32, &btnTextColor);
         button[i] = createTextBox(btnTexture[i], (winWidth - winWidth / 4) / 2, 180 + 60 * i);
     }
 
@@ -74,15 +74,14 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
                 case SDL_MOUSEBUTTONDOWN:
                     if (event.button.button == SDL_BUTTON_LEFT) {
                         if (isMouseHovering(&button[START_BTN])) mode = GAME;
-                        else if (isMouseHovering(&button[SETTINGS_BTN])) mode = MENU;
+                        else if (isMouseHovering(&button[SETTINGS_BTN])) mode = SETTINGS;
                         else if (isMouseHovering(&button[EXIT_BTN])) mode = EXIT;
                     }
                     break;
                 case SDL_KEYDOWN:
                     switch (event.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                            mode = EXIT;
-                            break;
+                        case SDLK_ESCAPE: mode = EXIT; break;
+                        case SDLK_RETURN: mode = GAME; break;
                     }
                     break;
             }
@@ -91,8 +90,6 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
         SDL_SetRenderDrawColor(renderer, bgColors.red, bgColors.green, bgColors.blue, 255);
         SDL_RenderClear(renderer);
 
-        SDL_SetRenderDrawColor(renderer, bgColors.red, bgColors.green, bgColors.blue, 255);
-        SDL_RenderFillRect(renderer, &headerTextBox);
         SDL_RenderCopy(renderer, headerTexture, NULL, &headerTextBox);
 
         for (int i = 0; i < BUTTON_AMOUNT; i ++) {
@@ -116,6 +113,9 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     switch (mode) {
         case GAME:
             gameLoop(window, renderer);
+            break;
+        case SETTINGS:
+            settingsLoop(window, renderer);
             break;
         case EXIT:
             return 0;

@@ -1,4 +1,4 @@
-// gcc main.c game_loop.c game_menu.c -o game $(sdl2-config --cflags --libs) -lSDL2_ttf -lSDL2_image -lSDL2_mixer
+// gcc main.c game_loop.c game_menu.c settings_menu.c -o game $(sdl2-config --cflags --libs) -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
@@ -7,6 +7,7 @@
 #include "game.h"
 
 int winWidth, winHeight;
+bool musicState = 1;
 
 Colors bgColors = {0};
 
@@ -26,10 +27,12 @@ int main(int argc, char *argv[]) {
 
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 	Mix_Music *bgMusic = Mix_LoadMUS("audio/background.mp3");
+
+	
 	
 	Mix_PlayMusic(bgMusic, -1);
 
-	SDL_Window *window = SDL_CreateWindow("Sepon Seikkailu", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+	SDL_Window *window = SDL_CreateWindow("Sepon Seikkailu", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	SDL_GetWindowSize(window, &winWidth, &winHeight);
