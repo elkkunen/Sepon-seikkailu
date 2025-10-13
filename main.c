@@ -1,6 +1,7 @@
-// gcc main.c game_loop.c game_menu.c -o game $(sdl2-config --cflags --libs) -lSDL2_ttf -lSDL2_image
+// gcc main.c game_loop.c game_menu.c -o game $(sdl2-config --cflags --libs) -lSDL2_ttf -lSDL2_image -lSDL2_mixer
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <time.h>
 #include <stdbool.h>
 #include "game.h"
@@ -21,8 +22,13 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	Mix_Music *bgMusic = Mix_LoadMUS("audio/background.mp3");
 	
+	Mix_PlayMusic(bgMusic, -1);
+
 	SDL_Window *window = SDL_CreateWindow("Sepon Seikkailu", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 500, 500, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -33,6 +39,8 @@ int main(int argc, char *argv[]) {
 		gameRunning = menuLoop(window, renderer);
 	} while (gameRunning);
 
+	Mix_FreeMusic(bgMusic);
+	Mix_CloseAudio();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
