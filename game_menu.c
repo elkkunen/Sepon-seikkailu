@@ -1,21 +1,22 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdbool.h>
 #include "game.h"
 
-typedef enum {
+enum  Buttons {
     START_BTN,
     SETTINGS_BTN,
     EXIT_BTN,
     BUTTON_AMOUNT
-} Buttons;
+};
 
-typedef enum {
+enum Modes {
     MENU,
-    EXIT,
     GAME,
-    SETTINGS
-} Modes;
+    SETTINGS,
+    EXIT
+};
 
 bool isMouseHovering(SDL_Rect *rect) {
     int mousex, mousey;
@@ -39,17 +40,22 @@ SDL_Rect createTextBox(SDL_Texture *texture, int x, int y) {
     int w, h;
     SDL_QueryTexture(texture, NULL, NULL, &w, &h);
 
-    SDL_Rect rect = {x, y, w, h};
+    SDL_Rect rect = {x - w / 2, y, w, h};
 
     return rect;
 }
 
 bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     TTF_Init();
-    
+
     Colors headerTextColor = {0, 0, 255};
     SDL_Texture *headerTexture = createText(renderer, "Sepon Seikkailu", HEADER_FONT, 42, &headerTextColor);
-    SDL_Rect headerTextBox = createTextBox(headerTexture, 0, 90);
+    SDL_Rect headerTextBox = createTextBox(headerTexture, winWidth / 2, 40);
+
+    char highscoreString[16];
+    sprintf(highscoreString, "Highscore: %d", highscore);
+    SDL_Texture *highscoreTexture = createText(renderer, highscoreString, DEFAULT_FONT, 32, &headerTextColor);
+    SDL_Rect highscoreTextBox = createTextBox(highscoreTexture, winWidth / 2, 120);
 
     SDL_Texture *btnTexture[BUTTON_AMOUNT];
     SDL_Rect button[BUTTON_AMOUNT];
@@ -59,7 +65,7 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
 
     for (int i = 0; i < BUTTON_AMOUNT; i ++) {
         btnTexture[i] = createText(renderer, buttonTexts[i], DEFAULT_FONT, 32, &btnTextColor);
-        button[i] = createTextBox(btnTexture[i], (winWidth - winWidth / 4) / 2, 180 + 60 * i);
+        button[i] = createTextBox(btnTexture[i], winWidth / 2, 180 + 60 * i);
     }
 
     SDL_Event event;
@@ -68,9 +74,7 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     while (mode == MENU) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_QUIT:
-                    mode = EXIT;
-                    break;
+                case SDL_QUIT: mode = EXIT; break;
                 case SDL_MOUSEBUTTONDOWN:
                     if (event.button.button == SDL_BUTTON_LEFT) {
                         if (isMouseHovering(&button[START_BTN])) mode = GAME;
@@ -91,6 +95,7 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
         SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, headerTexture, NULL, &headerTextBox);
+        SDL_RenderCopy(renderer, highscoreTexture, NULL, &highscoreTextBox);
 
         for (int i = 0; i < BUTTON_AMOUNT; i ++) {
             if (isMouseHovering(&button[i])) SDL_SetRenderDrawColor(renderer, 161, 161, 161, 255);
@@ -105,6 +110,7 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     }
 
     SDL_DestroyTexture(headerTexture);
+    SDL_DestroyTexture(highscoreTexture);
     for (int i = 0; i < BUTTON_AMOUNT; i ++) {
         SDL_DestroyTexture(btnTexture[i]);
     }
@@ -113,13 +119,12 @@ bool menuLoop(SDL_Window *window, SDL_Renderer *renderer) {
     switch (mode) {
         case GAME:
             gameLoop(window, renderer);
+            return 1;
             break;
         case SETTINGS:
             settingsLoop(window, renderer);
-            break;
-        case EXIT:
-            return 0;
+            return 1;
             break;
     }
-    return 1;
+    return 0;
 }

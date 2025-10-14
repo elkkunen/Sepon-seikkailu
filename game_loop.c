@@ -20,12 +20,12 @@ typedef struct {
 	SDL_Rect hitbox;
 } Box;
 
-typedef enum {
+enum Directions {
 	UP = 0,
 	RIGHT = 90,
 	DOWN = 180,
 	LEFT = 270
-} Directions;
+};
 
 void definePlayer(Player *player) {
 	player->x = winWidth / 2;
@@ -78,7 +78,7 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 
 	Colors scoreColor = {255, 255, 255};
 	SDL_Texture *scoreTexture = createText(renderer, "Score: 0", DEFAULT_FONT, 24, &scoreColor);
-	SDL_Rect scoreTextBox = createTextBox(scoreTexture, 5, 5);
+	SDL_Rect scoreTextBox = createTextBox(scoreTexture, 64, 5);
 
 	Player player;
 	definePlayer(&player);
@@ -150,8 +150,8 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 		SDL_SetRenderDrawColor(renderer, bgColors.red, bgColors.green, bgColors.blue, 255);
 		SDL_RenderClear(renderer);
 
-		drawPlayer(renderer, &player, playerImage, direction);
 		drawBox(renderer, &box);
+		drawPlayer(renderer, &player, playerImage, direction);
 
 		SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreTextBox);
 
@@ -163,4 +163,9 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 	SDL_DestroyTexture(playerImage);
 	TTF_Quit();
 	IMG_Quit();
+
+	if (score > highscore) {
+		highscore = score;
+		fileIO(WRITE, SCORE_FILE, &highscore, sizeof(score));
+	}
 }
