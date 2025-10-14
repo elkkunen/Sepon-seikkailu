@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-	Mix_Music *bgMusic = Mix_LoadMUS("audio/background.mp3");
+	Mix_Music *bgMusic = Mix_LoadMUS("src/audio/background.mp3");
 
 	Mix_PlayMusic(bgMusic, -1);
 	Mix_VolumeMusic(MIX_MAX_VOLUME * settings.music);

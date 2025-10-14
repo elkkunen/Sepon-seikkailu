@@ -72,7 +72,7 @@ void gameLoop(SDL_Window *window, SDL_Renderer *renderer) {
 	IMG_Init(IMG_INIT_PNG);
 	TTF_Init();
 
-	SDL_Surface *surface = IMG_Load("images/Seppo.png");
+	SDL_Surface *surface = IMG_Load("src/images/Seppo.png");
 	SDL_Texture *playerImage = SDL_CreateTextureFromSurface(renderer, surface);
 	SDL_FreeSurface(surface);
 

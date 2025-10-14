@@ -4,8 +4,8 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-#define HEADER_FONT "fonts/Header.ttf"
-#define DEFAULT_FONT "fonts/Buttons.ttf"
+#define HEADER_FONT "src/fonts/Header.ttf"
+#define DEFAULT_FONT "src/fonts/Buttons.ttf"
 
 #define SETTINGS_FILE "settings.bin"
 #define SCORE_FILE "score.bin"
