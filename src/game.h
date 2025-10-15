@@ -25,12 +25,13 @@ typedef struct {
 
 extern Settings settings;
 extern Colors bgColors;
+extern Colors textColors;
 
 extern int winWidth, winHeight;
 extern int highscore;
 
 extern bool menuLoop(SDL_Window *window, SDL_Renderer *renderer);
-extern void gameLoop(SDL_Window *window, SDL_Renderer *renderer);
+extern bool gameLoop(SDL_Window *window, SDL_Renderer *renderer);
 extern void settingsLoop(SDL_Window *window, SDL_Renderer *renderer);
 
 extern void fileIO(bool mode, const char *filename, void *data, size_t dataSize);
